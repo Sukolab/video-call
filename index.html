@@ -278,9 +278,13 @@
       var remoteStream = null;
       var peer = null;
       var remoteSocketId = null;
+      var currentRoomId = null;
       var isMuted = false;
       var isCameraOff = false;
-      var hasPendingOffer = false;
+      var makingOffer = false;
+      var ignoreOffer = false;
+      var polite = false;
+      var inRoom = false;
 
       var els = {
         nameInput: document.getElementById('nameInput'),
@@ -302,25 +306,27 @@
         els.status.textContent = text;
       }
 
-      function setButtonState(inCall) {
-        els.joinBtn.disabled = inCall;
-        els.leaveBtn.disabled = !inCall;
-        els.muteBtn.disabled = !inCall;
-        els.cameraBtn.disabled = !inCall;
-      }
-
       function generateRoomCode() {
         return 'room-' + Math.random().toString(36).slice(2, 8) + '-' + Math.random().toString(36).slice(2, 6);
+      }
+
+      function updateUiState() {
+        els.joinBtn.disabled = inRoom;
+        els.leaveBtn.disabled = !inRoom;
+        els.muteBtn.disabled = !inRoom;
+        els.cameraBtn.disabled = !inRoom;
+        els.generateRoomBtn.disabled = inRoom;
+        els.roomInput.disabled = inRoom;
       }
 
       function getMedia() {
         var constraints = {
           audio: true,
           video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            frameRate: { ideal: 15, max: 24 },
-            facingMode: 'user'
+            facingMode: 'user',
+            width: { ideal: 320 },
+            height: { ideal: 240 },
+            frameRate: { ideal: 12, max: 15 }
           }
         };
 
@@ -343,64 +349,87 @@
         });
       }
 
-      function buildPeer() {
-        var pc = new RTCPeerConnection({
+      function stopStream(stream) {
+        if (!stream) return;
+        var tracks = stream.getTracks();
+        for (var i = 0; i < tracks.length; i++) {
+          tracks[i].stop();
+        }
+      }
+
+      function ensurePeer() {
+        if (peer) return peer;
+
+        peer = new RTCPeerConnection({
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' }
           ]
         });
 
-        pc.onicecandidate = function (event) {
+        peer.onicecandidate = function (event) {
           if (event.candidate && remoteSocketId && socket) {
             socket.emit('signal', {
               to: remoteSocketId,
-              data: { type: 'candidate', candidate: event.candidate }
+              data: { candidate: event.candidate }
             });
           }
         };
 
-        pc.ontrack = function (event) {
+        peer.ontrack = function (event) {
           if (!remoteStream) {
             remoteStream = new MediaStream();
             els.remoteVideo.srcObject = remoteStream;
             els.remoteVideo.setAttribute('playsinline', 'true');
+            if (els.remoteVideo.play) {
+              els.remoteVideo.play().catch(function(){});
+            }
           }
           remoteStream.addTrack(event.track);
           els.remoteState.textContent = 'Connected';
         };
 
-        pc.onconnectionstatechange = function () {
-          var state = pc.connectionState || 'unknown';
+        peer.onconnectionstatechange = function () {
+          var state = peer.connectionState || 'unknown';
           if (state === 'connected') {
             els.remoteState.textContent = 'Connected';
             setStatus('Call connected.');
           } else if (state === 'failed' || state === 'disconnected') {
             els.remoteState.textContent = 'Issue';
-            setStatus('Connection issue. Try leave then join again.');
+            setStatus('Connection issue. Try leaving and joining again.');
           } else if (state === 'closed') {
             els.remoteState.textContent = 'Closed';
           }
         };
 
-        return pc;
-      }
+        peer.onnegotiationneeded = async function () {
+          try {
+            if (!inRoom || !remoteSocketId) return;
+            makingOffer = true;
+            await peer.setLocalDescription();
+            socket.emit('signal', {
+              to: remoteSocketId,
+              data: { description: peer.localDescription }
+            });
+            setStatus('Negotiating call...');
+          } catch (err) {
+            setStatus('Negotiation error: ' + ((err && err.message) ? err.message : String(err)));
+          } finally {
+            makingOffer = false;
+          }
+        };
 
-      function createRemoteStream() {
-        remoteStream = new MediaStream();
-        els.remoteVideo.srcObject = remoteStream;
-        els.remoteVideo.setAttribute('playsinline', 'true');
-      }
+        if (localStream) {
+          var tracks = localStream.getTracks();
+          for (var i = 0; i < tracks.length; i++) {
+            peer.addTrack(tracks[i], localStream);
+          }
+        }
 
-      function stopStream(stream) {
-        if (!stream) return;
-        var tracks = stream.getTracks();
-        for (var i = 0; i < tracks.length; i++) tracks[i].stop();
+        return peer;
       }
 
       function resetCallUI() {
         if (peer) {
-          peer.ontrack = null;
-          peer.onicecandidate = null;
           try { peer.close(); } catch (e) {}
           peer = null;
         }
@@ -409,21 +438,19 @@
         localStream = null;
         remoteStream = null;
         remoteSocketId = null;
-        hasPendingOffer = false;
+        currentRoomId = null;
+        makingOffer = false;
+        ignoreOffer = false;
+        polite = false;
+        inRoom = false;
 
         els.localVideo.srcObject = null;
         els.remoteVideo.srcObject = null;
         els.localState.textContent = 'Idle';
         els.remoteState.textContent = 'Waiting';
-        setButtonState(false);
-      }
-
-      function attachLocalTracks() {
-        if (!peer || !localStream) return;
-        var tracks = localStream.getTracks();
-        for (var i = 0; i < tracks.length; i++) {
-          peer.addTrack(tracks[i], localStream);
-        }
+        els.muteBtn.textContent = 'Mute';
+        els.cameraBtn.textContent = 'Camera off';
+        updateUiState();
       }
 
       function ensureSocket() {
@@ -447,11 +474,13 @@
         });
 
         socket.on('joined-room', function (payload) {
-          setStatus('Joined room: ' + payload.roomId + '. Waiting for partner...');
+          currentRoomId = payload.roomId;
+          polite = !!(payload.peers && payload.peers.length > 0);
+          setStatus('Joined room: ' + payload.roomId + '. ' + (payload.peers && payload.peers.length > 0 ? 'Partner found.' : 'Waiting for partner...'));
+
           if (payload.peers && payload.peers.length > 0) {
             remoteSocketId = payload.peers[0];
-            setStatus('Partner found. Starting call...');
-            startOffer();
+            ensurePeer();
           }
         });
 
@@ -459,39 +488,56 @@
           remoteSocketId = payload.socketId;
           els.remoteState.textContent = 'Joining';
           setStatus((payload.displayName || 'Partner') + ' joined. Starting call...');
-          if (!hasPendingOffer) {
-            startOffer();
-          }
+          ensurePeer();
         });
 
         socket.on('signal', async function (message) {
           try {
             remoteSocketId = message.from;
-            var data = message.data;
+            var data = message.data || {};
+            var pc = ensurePeer();
 
-            if (!peer) {
-              peer = buildPeer();
-              createRemoteStream();
-              attachLocalTracks();
-            }
+            if (data.description) {
+              var offerCollision =
+                data.description.type === 'offer' &&
+                (makingOffer || pc.signalingState !== 'stable');
 
-            if (data.type === 'offer') {
-              await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
-              var answer = await peer.createAnswer();
-              await peer.setLocalDescription(answer);
-              socket.emit('signal', {
-                to: remoteSocketId,
-                data: { type: 'answer', answer: answer }
-              });
-              setStatus('Incoming call accepted.');
-              els.remoteState.textContent = 'Connecting';
-            } else if (data.type === 'answer') {
-              await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
-              hasPendingOffer = false;
-              setStatus('Partner answered. Connecting...');
-              els.remoteState.textContent = 'Connecting';
-            } else if (data.type === 'candidate' && data.candidate) {
-              await peer.addIceCandidate(new RTCIceCandidate(data.candidate));
+              ignoreOffer = !polite && offerCollision;
+              if (ignoreOffer) {
+                return;
+              }
+
+              if (offerCollision) {
+                try {
+                  await Promise.all([
+                    pc.setLocalDescription({ type: 'rollback' }),
+                    pc.setRemoteDescription(data.description)
+                  ]);
+                } catch (_rollbackErr) {
+                  await pc.setRemoteDescription(data.description);
+                }
+              } else {
+                await pc.setRemoteDescription(data.description);
+              }
+
+              if (data.description.type === 'offer') {
+                await pc.setLocalDescription();
+                socket.emit('signal', {
+                  to: remoteSocketId,
+                  data: { description: pc.localDescription }
+                });
+                els.remoteState.textContent = 'Connecting';
+                setStatus('Incoming call accepted.');
+              } else if (data.description.type === 'answer') {
+                els.remoteState.textContent = 'Connecting';
+                setStatus('Partner answered. Connecting...');
+              }
+            } else if (data.candidate) {
+              try {
+                await pc.addIceCandidate(data.candidate);
+              } catch (err) {
+                if (!ignoreOffer) throw err;
+              }
             }
           } catch (err) {
             setStatus('Signal error: ' + ((err && err.message) ? err.message : String(err)));
@@ -512,7 +558,8 @@
 
         socket.on('room-full', function () {
           setStatus('Room is full. Only 2 users are allowed.');
-          setButtonState(false);
+          inRoom = false;
+          updateUiState();
         });
 
         socket.on('room-error', function (message) {
@@ -522,29 +569,9 @@
         return true;
       }
 
-      async function startOffer() {
-        try {
-          if (!remoteSocketId) return;
-          if (!peer) {
-            peer = buildPeer();
-            createRemoteStream();
-            attachLocalTracks();
-          }
-          hasPendingOffer = true;
-          var offer = await peer.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
-          await peer.setLocalDescription(offer);
-          socket.emit('signal', {
-            to: remoteSocketId,
-            data: { type: 'offer', offer: offer }
-          });
-          els.remoteState.textContent = 'Calling';
-          setStatus('Calling partner...');
-        } catch (err) {
-          setStatus('Could not start call: ' + ((err && err.message) ? err.message : String(err)));
-        }
-      }
-
       async function joinRoom() {
+        if (inRoom) return;
+
         var roomId = els.roomInput.value.trim();
         var displayName = els.nameInput.value.trim() || 'Guest';
 
@@ -561,14 +588,15 @@
           els.localVideo.srcObject = localStream;
           els.localVideo.setAttribute('playsinline', 'true');
           els.localVideo.muted = true;
-          if (els.localVideo.play) els.localVideo.play().catch(function(){});
+          if (els.localVideo.play) {
+            els.localVideo.play().catch(function(){});
+          }
           els.localState.textContent = 'Ready';
 
           isMuted = false;
           isCameraOff = false;
-          els.muteBtn.textContent = 'Mute';
-          els.cameraBtn.textContent = 'Camera off';
-          setButtonState(true);
+          inRoom = true;
+          updateUiState();
 
           socket.emit('join-room', { roomId: roomId, displayName: displayName });
         } catch (err) {
@@ -632,9 +660,11 @@
       }
 
       els.generateRoomBtn.addEventListener('click', function () {
+        if (inRoom) return;
         els.roomInput.value = generateRoomCode();
         setStatus('Room code generated.');
       });
+
       els.copyRoomBtn.addEventListener('click', copyRoom);
       els.joinBtn.addEventListener('click', joinRoom);
       els.leaveBtn.addEventListener('click', leaveRoom);
@@ -647,8 +677,9 @@
         els.roomInput.value = generateRoomCode();
       }
 
-      setButtonState(false);
+      updateUiState();
     })();
   </script>
+
 </body>
 </html>
