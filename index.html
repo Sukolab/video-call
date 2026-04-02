@@ -175,35 +175,48 @@
         els.roomInput.disabled = inRoom;
       }
 
-      function getMedia() {
-        var constraints = {
-          audio: true,
-          video: {
-            facingMode: 'user',
-            width: { ideal: 320 },
-            height: { ideal: 240 },
-            frameRate: { ideal: 12, max: 15 }
-          }
-        };
+     async function getMedia() {
+  // ultra low first (ipad safe)
+  const ultraLow = {
+    audio: true,
+    video: {
+      width: 160,
+      height: 120,
+      frameRate: 8
+    }
+  };
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          return navigator.mediaDevices.getUserMedia(constraints);
-        }
+  // no facingMode fallback (IMPORTANT)
+  const fallback = {
+    audio: true,
+    video: true
+  };
 
-        var legacy =
-          navigator.getUserMedia ||
-          navigator.webkitGetUserMedia ||
-          navigator.mozGetUserMedia ||
-          navigator.msGetUserMedia;
+  function legacy(constraints) {
+    const g =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia;
 
-        if (!legacy) {
-          return Promise.reject(new Error('Camera not supported on this device/browser'));
-        }
+    if (!g) return Promise.reject("no camera");
 
-        return new Promise(function (resolve, reject) {
-          legacy.call(navigator, constraints, resolve, reject);
-        });
-      }
+    return new Promise((res, rej) => g.call(navigator, constraints, res, rej));
+  }
+
+  try {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      return await navigator.mediaDevices.getUserMedia(ultraLow);
+    }
+    return await legacy(ultraLow);
+  } catch (e) {
+    console.log("low failed, fallback");
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      return await navigator.mediaDevices.getUserMedia(fallback);
+    }
+    return await legacy(fallback);
+  }
+}
 
       function stopStream(stream) {
         if (!stream) return;
@@ -418,6 +431,15 @@
           setStatus('Opening camera and microphone...');
           localStream = await getMedia();
           els.localVideo.srcObject = localStream;
+          setTimeout(function () {
+  try {
+    els.localVideo.load();
+  } catch (e) {}
+
+  if (els.localVideo.play) {
+    els.localVideo.play().catch(() => {});
+  }
+}, 200);
           els.localVideo.setAttribute('playsinline', 'true');
           els.localVideo.muted = true;
           if (els.localVideo.play) els.localVideo.play().catch(function(){});
