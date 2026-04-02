@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Private Call</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --bg2:#121935;
+      --card:rgba(20,26,52,.88);
+      --line:rgba(255,255,255,.08);
+      --text:#eef3ff;
+      --muted:#9aa7c7;
+      --accent:#7c9cff;
+      --accent2:#5ce1e6;
+      --ok:#6fd39c;
+      --danger:#ff7272;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(circle at top left, rgba(124,156,255,.18), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(92,225,230,.12), transparent 28%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      min-height:100%;
+    }
+    .shell{max-width:1120px;margin:0 auto;padding:18px}
+    .hero{
+      display:flex;gap:16px;align-items:center;justify-content:space-between;
+      margin-bottom:16px;flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;align-items:center;gap:14px;
+    }
+    .logo{
+      width:50px;height:50px;border-radius:16px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 12px 32px rgba(124,156,255,.35);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;font-size:20px;color:white;
+    }
+    .title h1{margin:0;font-size:30px;line-height:1.05}
+    .title p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:18px;
+    }
+    .panel,.stage{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .panel{padding:18px}
+    .stage{padding:18px}
+    .section-title{
+      font-size:13px;
+      color:#cad5f3;
+      margin:0 0 8px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+    .label{
+      display:block;
+      margin:12px 0 6px;
+      color:#c7d3f1;
+      font-size:13px;
+    }
+    .input{
+      width:100%;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(7,11,25,.7);
+      color:var(--text);
+      padding:14px 15px;
+      font-size:16px;
+      outline:none;
+    }
+    .input:focus{
+      border-color:rgba(124,156,255,.6);
+      box-shadow:0 0 0 4px rgba(124,156,255,.12);
+    }
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+    button{
+      border:none;
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      color:white;
+      background:#2a355f;
+      transition:transform .12s ease,opacity .12s ease,background .12s ease;
+    }
+    button:active{transform:scale(.985)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .primary{background:linear-gradient(135deg,var(--accent),#6686ff)}
+    .secondary{background:#25304f}
+    .success{background:#1e5c45}
+    .danger{background:#672c37}
+    .full{grid-column:1/-1}
+    .status{
+      margin-top:14px;
+      padding:12px 13px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      min-height:50px;
+      color:#dbe6ff;
+      font-size:14px;
+      line-height:1.45;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .tips{
+      margin-top:14px;
+      padding:14px;
+      border-radius:18px;
+      background:rgba(124,156,255,.08);
+      border:1px solid rgba(124,156,255,.16);
+      color:#d3defd;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .videos{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .video-card{
+      border:1px solid var(--line);
+      background:rgba(4,8,20,.55);
+      border-radius:22px;
+      overflow:hidden;
+      min-height:260px;
+    }
+    .video-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      color:#d7e3ff;
+      font-size:14px;
+    }
+    .badge{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+    }
+    video{
+      width:100%;
+      height:340px;
+      display:block;
+      background:#02040a;
+      object-fit:cover;
+      transform:scaleX(-1);
+    }
+    .bottom-tools{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:14px;
+    }
+    .foot{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+    @media (max-width: 900px){
+      .layout{grid-template-columns:1fr}
+      .videos{grid-template-columns:1fr}
+      video{height:250px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hero">
+      <div class="brand">
+        <div class="logo">PC</div>
+        <div class="title">
+          <h1>Private Call</h1>
+          <p>Render-ready 1-to-1 call page optimized for older Safari as much as possible.</p>
+        </div>
+      </div>
+      <div class="pill">Best chance on iPad: Safari + HTTPS + strong Wi‑Fi</div>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <p class="section-title">Room setup</p>
+
+        <label class="label" for="nameInput">Your name</label>
+        <input class="input" id="nameInput" maxlength="32" placeholder="Your name" value="Massim" />
+
+        <label class="label" for="roomInput">Room code</label>
+        <input class="input" id="roomInput" maxlength="64" placeholder="example: massim-love-room" />
+
+        <div class="actions">
+          <button class="secondary" id="generateRoomBtn">Generate</button>
+          <button class="secondary" id="copyRoomBtn">Copy</button>
+          <button class="primary full" id="joinBtn">Join room</button>
+        </div>
+
+        <div class="status" id="status">Not connected.</div>
+
+        <div class="tips">
+          <strong>For iPad iOS 12:</strong><br>
+          1. Use Safari only.<br>
+          2. Open the Render HTTPS link, not localhost.<br>
+          3. If camera fails, refresh once and try again.<br>
+          4. Old iPad support is limited, so this is optimized but not guaranteed.
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="videos">
+          <div class="video-card">
+            <div class="video-head">
+              <span>You</span>
+              <span class="badge" id="localState">Idle</span>
+            </div>
+            <video id="localVideo" autoplay playsinline muted></video>
+          </div>
+          <div class="video-card">
+            <div class="video-head">
+              <span>Partner</span>
+              <span class="badge" id="remoteState">Waiting</span>
+            </div>
+            <video id="remoteVideo" autoplay playsinline></video>
+          </div>
+        </div>
+
+        <div class="bottom-tools">
+          <button class="success" id="muteBtn" disabled>Mute</button>
+          <button class="success" id="cameraBtn" disabled>Camera off</button>
+          <button class="danger" id="leaveBtn" disabled>Leave</button>
+        </div>
+
+        <div class="foot">
+          This version is designed for Render deployment and includes clearer status messages for debugging on iPad.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    (function () {
+      var socket = null;
+      var localStream = null;
+      var remoteStream = null;
+      var peer = null;
+      var remoteSocketId = null;
+      var isMuted = false;
+      var isCameraOff = false;
+      var hasPendingOffer = false;
+
+      var els = {
+        nameInput: document.getElementById('nameInput'),
+        roomInput: document.getElementById('roomInput'),
+        generateRoomBtn: document.getElementById('generateRoomBtn'),
+        copyRoomBtn: document.getElementById('copyRoomBtn'),
+        joinBtn: document.getElementById('joinBtn'),
+        muteBtn: document.getElementById('muteBtn'),
+        cameraBtn: document.getElementById('cameraBtn'),
+        leaveBtn: document.getElementById('leaveBtn'),
+        localVideo: document.getElementById('localVideo'),
+        remoteVideo: document.getElementById('remoteVideo'),
+        status: document.getElementById('status'),
+        localState: document.getElementById('localState'),
+        remoteState: document.getElementById('remoteState')
+      };
+
+      function setStatus(text) {
+        els.status.textContent = text;
+      }
+
+      function setButtonState(inCall) {
+        els.joinBtn.disabled = inCall;
+        els.leaveBtn.disabled = !inCall;
+        els.muteBtn.disabled = !inCall;
+        els.cameraBtn.disabled = !inCall;
+      }
+
+      function generateRoomCode() {
+        return 'room-' + Math.random().toString(36).slice(2, 8) + '-' + Math.random().toString(36).slice(2, 6);
+      }
+
+      function getMedia() {
+        var constraints = {
+          audio: true,
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            frameRate: { ideal: 15, max: 24 },
+            facingMode: 'user'
+          }
+        };
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          return navigator.mediaDevices.getUserMedia(constraints);
+        }
+
+        var legacy =
+          navigator.getUserMedia ||
+          navigator.webkitGetUserMedia ||
+          navigator.mozGetUserMedia ||
+          navigator.msGetUserMedia;
+
+        if (!legacy) {
+          return Promise.reject(new Error('Camera not supported on this device/browser'));
+        }
+
+        return new Promise(function (resolve, reject) {
+          legacy.call(navigator, constraints, resolve, reject);
+        });
+      }
+
+      function buildPeer() {
+        var pc = new RTCPeerConnection({
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' }
+          ]
+        });
+
+        pc.onicecandidate = function (event) {
+          if (event.candidate && remoteSocketId && socket) {
+            socket.emit('signal', {
+              to: remoteSocketId,
+              data: { type: 'candidate', candidate: event.candidate }
+            });
+          }
+        };
+
+        pc.ontrack = function (event) {
+          if (!remoteStream) {
+            remoteStream = new MediaStream();
+            els.remoteVideo.srcObject = remoteStream;
+            els.remoteVideo.setAttribute('playsinline', 'true');
+          }
+          remoteStream.addTrack(event.track);
+          els.remoteState.textContent = 'Connected';
+        };
+
+        pc.onconnectionstatechange = function () {
+          var state = pc.connectionState || 'unknown';
+          if (state === 'connected') {
+            els.remoteState.textContent = 'Connected';
+            setStatus('Call connected.');
+          } else if (state === 'failed' || state === 'disconnected') {
+            els.remoteState.textContent = 'Issue';
+            setStatus('Connection issue. Try leave then join again.');
+          } else if (state === 'closed') {
+            els.remoteState.textContent = 'Closed';
+          }
+        };
+
+        return pc;
+      }
+
+      function createRemoteStream() {
+        remoteStream = new MediaStream();
+        els.remoteVideo.srcObject = remoteStream;
+        els.remoteVideo.setAttribute('playsinline', 'true');
+      }
+
+      function stopStream(stream) {
+        if (!stream) return;
+        var tracks = stream.getTracks();
+        for (var i = 0; i < tracks.length; i++) tracks[i].stop();
+      }
+
+      function resetCallUI() {
+        if (peer) {
+          peer.ontrack = null;
+          peer.onicecandidate = null;
+          try { peer.close(); } catch (e) {}
+          peer = null;
+        }
+
+        stopStream(localStream);
+        localStream = null;
+        remoteStream = null;
+        remoteSocketId = null;
+        hasPendingOffer = false;
+
+        els.localVideo.srcObject = null;
+        els.remoteVideo.srcObject = null;
+        els.localState.textContent = 'Idle';
+        els.remoteState.textContent = 'Waiting';
+        setButtonState(false);
+      }
+
+      function attachLocalTracks() {
+        if (!peer || !localStream) return;
+        var tracks = localStream.getTracks();
+        for (var i = 0; i < tracks.length; i++) {
+          peer.addTrack(tracks[i], localStream);
+        }
+      }
+
+      function ensureSocket() {
+        if (socket) return true;
+
+        if (typeof io === 'undefined') {
+          setStatus('Socket.IO failed to load. Deploy this on Render, not static hosting.');
+          return false;
+        }
+
+        socket = io({
+          transports: ['websocket', 'polling']
+        });
+
+        socket.on('connect', function () {
+          setStatus('Connected to server. Ready to join room.');
+        });
+
+        socket.on('connect_error', function (err) {
+          setStatus('Server connection failed: ' + ((err && err.message) ? err.message : String(err)));
+        });
+
+        socket.on('joined-room', function (payload) {
+          setStatus('Joined room: ' + payload.roomId + '. Waiting for partner...');
+          if (payload.peers && payload.peers.length > 0) {
+            remoteSocketId = payload.peers[0];
+            setStatus('Partner found. Starting call...');
+            startOffer();
+          }
+        });
+
+        socket.on('peer-joined', function (payload) {
+          remoteSocketId = payload.socketId;
+          els.remoteState.textContent = 'Joining';
+          setStatus((payload.displayName || 'Partner') + ' joined. Starting call...');
+          if (!hasPendingOffer) {
+            startOffer();
+          }
+        });
+
+        socket.on('signal', async function (message) {
+          try {
+            remoteSocketId = message.from;
+            var data = message.data;
+
+            if (!peer) {
+              peer = buildPeer();
+              createRemoteStream();
+              attachLocalTracks();
+            }
+
+            if (data.type === 'offer') {
+              await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
+              var answer = await peer.createAnswer();
+              await peer.setLocalDescription(answer);
+              socket.emit('signal', {
+                to: remoteSocketId,
+                data: { type: 'answer', answer: answer }
+              });
+              setStatus('Incoming call accepted.');
+              els.remoteState.textContent = 'Connecting';
+            } else if (data.type === 'answer') {
+              await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
+              hasPendingOffer = false;
+              setStatus('Partner answered. Connecting...');
+              els.remoteState.textContent = 'Connecting';
+            } else if (data.type === 'candidate' && data.candidate) {
+              await peer.addIceCandidate(new RTCIceCandidate(data.candidate));
+            }
+          } catch (err) {
+            setStatus('Signal error: ' + ((err && err.message) ? err.message : String(err)));
+          }
+        });
+
+        socket.on('peer-left', function () {
+          els.remoteState.textContent = 'Left';
+          els.remoteVideo.srcObject = null;
+          remoteStream = null;
+          remoteSocketId = null;
+          if (peer) {
+            try { peer.close(); } catch (e) {}
+            peer = null;
+          }
+          setStatus('Partner left the room.');
+        });
+
+        socket.on('room-full', function () {
+          setStatus('Room is full. Only 2 users are allowed.');
+          setButtonState(false);
+        });
+
+        socket.on('room-error', function (message) {
+          setStatus(message || 'Room error.');
+        });
+
+        return true;
+      }
+
+      async function startOffer() {
+        try {
+          if (!remoteSocketId) return;
+          if (!peer) {
+            peer = buildPeer();
+            createRemoteStream();
+            attachLocalTracks();
+          }
+          hasPendingOffer = true;
+          var offer = await peer.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
+          await peer.setLocalDescription(offer);
+          socket.emit('signal', {
+            to: remoteSocketId,
+            data: { type: 'offer', offer: offer }
+          });
+          els.remoteState.textContent = 'Calling';
+          setStatus('Calling partner...');
+        } catch (err) {
+          setStatus('Could not start call: ' + ((err && err.message) ? err.message : String(err)));
+        }
+      }
+
+      async function joinRoom() {
+        var roomId = els.roomInput.value.trim();
+        var displayName = els.nameInput.value.trim() || 'Guest';
+
+        if (!roomId) {
+          setStatus('Enter a room code first.');
+          return;
+        }
+
+        if (!ensureSocket()) return;
+
+        try {
+          setStatus('Opening camera and microphone...');
+          localStream = await getMedia();
+          els.localVideo.srcObject = localStream;
+          els.localVideo.setAttribute('playsinline', 'true');
+          els.localVideo.muted = true;
+          if (els.localVideo.play) els.localVideo.play().catch(function(){});
+          els.localState.textContent = 'Ready';
+
+          isMuted = false;
+          isCameraOff = false;
+          els.muteBtn.textContent = 'Mute';
+          els.cameraBtn.textContent = 'Camera off';
+          setButtonState(true);
+
+          socket.emit('join-room', { roomId: roomId, displayName: displayName });
+        } catch (err) {
+          setStatus('Camera/mic failed: ' + ((err && err.message) ? err.message : String(err)) + '. On iPad use Safari over HTTPS.');
+          resetCallUI();
+        }
+      }
+
+      function leaveRoom() {
+        if (socket) {
+          socket.disconnect();
+          socket = null;
+        }
+        resetCallUI();
+        setStatus('Left call.');
+      }
+
+      function copyRoom() {
+        var text = els.roomInput.value.trim();
+        if (!text) {
+          setStatus('Nothing to copy yet.');
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            setStatus('Room code copied.');
+          }).catch(function () {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+          document.execCommand('copy');
+          setStatus('Room code copied.');
+        } catch (e) {
+          setStatus('Copy failed. Please copy the room code manually.');
+        }
+        document.body.removeChild(temp);
+      }
+
+      function toggleMute() {
+        if (!localStream) return;
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach(function(track){ track.enabled = !isMuted; });
+        els.muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
+      }
+
+      function toggleCamera() {
+        if (!localStream) return;
+        isCameraOff = !isCameraOff;
+        localStream.getVideoTracks().forEach(function(track){ track.enabled = !isCameraOff; });
+        els.cameraBtn.textContent = isCameraOff ? 'Camera on' : 'Camera off';
+      }
+
+      els.generateRoomBtn.addEventListener('click', function () {
+        els.roomInput.value = generateRoomCode();
+        setStatus('Room code generated.');
+      });
+      els.copyRoomBtn.addEventListener('click', copyRoom);
+      els.joinBtn.addEventListener('click', joinRoom);
+      els.leaveBtn.addEventListener('click', leaveRoom);
+      els.muteBtn.addEventListener('click', toggleMute);
+      els.cameraBtn.addEventListener('click', toggleCamera);
+
+      if (location.hash && location.hash.length > 1) {
+        els.roomInput.value = decodeURIComponent(location.hash.slice(1));
+      } else {
+        els.roomInput.value = generateRoomCode();
+      }
+
+      setButtonState(false);
+    })();
+  </script>
+</body>
+</html>

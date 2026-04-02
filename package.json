@@ -1,0 +1,14 @@
+{
+  "name": "render-ipad-video-call-pro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Render-ready private 1-to-1 video call with polished UI and iPad-focused fallbacks",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
