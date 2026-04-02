@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>iPad Camera Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background:black;color:white;text-align:center">
+
+  <h2>Camera Test</h2>
+  <p id="status">Click start</p>
+
+  <video id="video" autoplay playsinline muted style="width:90%;max-width:400px;background:#000"></video>
+  <br><br>
+  <button onclick="start()">Start Camera</button>
+
+  <script>
+    async function start() {
+      const status = document.getElementById("status");
+      const video = document.getElementById("video");
+
+      try {
+        status.innerText = "Requesting camera...";
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+
+        video.srcObject = stream;
+
+        setTimeout(() => {
+          video.play().catch(()=>{});
+        }, 200);
+
+        const track = stream.getVideoTracks()[0];
+
+        status.innerText = "Camera started: " + track.readyState;
+
+      } catch (err) {
+        status.innerText = "ERROR: " + err.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
