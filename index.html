@@ -175,9 +175,8 @@
         els.roomInput.disabled = inRoom;
       }
 
-     async function getMedia() {
-  // ultra low first (ipad safe)
-  const ultraLow = {
+     async function getMedia(preferRear) {
+  var ultraLow = {
     audio: true,
     video: {
       width: 160,
@@ -186,21 +185,29 @@
     }
   };
 
-  // no facingMode fallback (IMPORTANT)
-  const fallback = {
+  if (preferRear) {
+    ultraLow.video.facingMode = { ideal: 'environment' };
+  }
+
+  var fallback = {
     audio: true,
     video: true
   };
 
   function legacy(constraints) {
-    const g =
+    var g =
       navigator.getUserMedia ||
       navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia;
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
 
-    if (!g) return Promise.reject("no camera");
+    if (!g) {
+      return Promise.reject(new Error('Camera not supported'));
+    }
 
-    return new Promise((res, rej) => g.call(navigator, constraints, res, rej));
+    return new Promise(function (resolve, reject) {
+      g.call(navigator, constraints, resolve, reject);
+    });
   }
 
   try {
@@ -209,8 +216,6 @@
     }
     return await legacy(ultraLow);
   } catch (e) {
-    console.log("low failed, fallback");
-
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       return await navigator.mediaDevices.getUserMedia(fallback);
     }
@@ -429,17 +434,8 @@
 
         try {
           setStatus('Opening camera and microphone...');
-          localStream = await getMedia();
+          localStream = await getMedia(false);
           els.localVideo.srcObject = localStream;
-          setTimeout(function () {
-  try {
-    els.localVideo.load();
-  } catch (e) {}
-
-  if (els.localVideo.play) {
-    els.localVideo.play().catch(() => {});
-  }
-}, 200);
           els.localVideo.setAttribute('playsinline', 'true');
           els.localVideo.muted = true;
           if (els.localVideo.play) els.localVideo.play().catch(function(){});
