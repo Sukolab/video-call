@@ -6,21 +6,13 @@
   <title>Private Call</title>
   <style>
     :root{
-      --bg:#0b1020;
-      --bg2:#121935;
-      --card:rgba(20,26,52,.88);
-      --line:rgba(255,255,255,.08);
-      --text:#eef3ff;
-      --muted:#9aa7c7;
-      --accent:#7c9cff;
-      --accent2:#5ce1e6;
-      --ok:#6fd39c;
-      --danger:#ff7272;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
-      --radius:24px;
+      --bg:#0b1020;--bg2:#121935;--card:rgba(20,26,52,.88);--line:rgba(255,255,255,.08);
+      --text:#eef3ff;--muted:#9aa7c7;--accent:#7c9cff;--accent2:#5ce1e6;--shadow:0 20px 60px rgba(0,0,0,.35);--radius:24px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:
+    html,body{
+      margin:0;padding:0;
+      background:
       radial-gradient(circle at top left, rgba(124,156,255,.18), transparent 30%),
       radial-gradient(circle at bottom right, rgba(92,225,230,.12), transparent 28%),
       linear-gradient(180deg,var(--bg),var(--bg2));
@@ -29,89 +21,26 @@
       min-height:100%;
     }
     .shell{max-width:1120px;margin:0 auto;padding:18px}
-    .hero{
-      display:flex;gap:16px;align-items:center;justify-content:space-between;
-      margin-bottom:16px;flex-wrap:wrap;
-    }
-    .brand{
-      display:flex;align-items:center;gap:14px;
-    }
+    .hero{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:14px}
     .logo{
-      width:50px;height:50px;border-radius:16px;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      box-shadow:0 12px 32px rgba(124,156,255,.35);
-      display:flex;align-items:center;justify-content:center;
+      width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 12px 32px rgba(124,156,255,.35);display:flex;align-items:center;justify-content:center;
       font-weight:800;font-size:20px;color:white;
     }
     .title h1{margin:0;font-size:30px;line-height:1.05}
     .title p{margin:6px 0 0;color:var(--muted);font-size:14px}
-    .pill{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:12px;
-      white-space:nowrap;
-    }
-    .layout{
-      display:grid;
-      grid-template-columns:360px 1fr;
-      gap:18px;
-    }
-    .panel,.stage{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-    .panel{padding:18px}
-    .stage{padding:18px}
-    .section-title{
-      font-size:13px;
-      color:#cad5f3;
-      margin:0 0 8px;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-    }
-    .label{
-      display:block;
-      margin:12px 0 6px;
-      color:#c7d3f1;
-      font-size:13px;
-    }
-    .input{
-      width:100%;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(7,11,25,.7);
-      color:var(--text);
-      padding:14px 15px;
-      font-size:16px;
-      outline:none;
-    }
-    .input:focus{
-      border-color:rgba(124,156,255,.6);
-      box-shadow:0 0 0 4px rgba(124,156,255,.12);
-    }
-    .actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:14px;
-    }
-    button{
-      border:none;
-      border-radius:16px;
-      padding:13px 14px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-      color:white;
-      background:#2a355f;
-      transition:transform .12s ease,opacity .12s ease,background .12s ease;
-    }
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);border-radius:999px;padding:8px 12px;font-size:12px;white-space:nowrap}
+    .layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
+    .panel,.stage{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter: blur(10px)}
+    .panel{padding:18px}.stage{padding:18px}
+    .section-title{font-size:13px;color:#cad5f3;margin:0 0 8px;letter-spacing:.03em;text-transform:uppercase}
+    .label{display:block;margin:12px 0 6px;color:#c7d3f1;font-size:13px}
+    .input{width:100%;border-radius:16px;border:1px solid var(--line);background:rgba(7,11,25,.7);color:var(--text);padding:14px 15px;font-size:16px;outline:none}
+    .input:focus{border-color:rgba(124,156,255,.6);box-shadow:0 0 0 4px rgba(124,156,255,.12)}
+    .input:disabled{opacity:.65}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    button{border:none;border-radius:16px;padding:13px 14px;font-size:15px;font-weight:700;cursor:pointer;color:white;background:#2a355f;transition:transform .12s ease,opacity .12s ease,background .12s ease}
     button:active{transform:scale(.985)}
     button:disabled{opacity:.55;cursor:not-allowed}
     .primary{background:linear-gradient(135deg,var(--accent),#6686ff)}
@@ -119,84 +48,16 @@
     .success{background:#1e5c45}
     .danger{background:#672c37}
     .full{grid-column:1/-1}
-    .status{
-      margin-top:14px;
-      padding:12px 13px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      min-height:50px;
-      color:#dbe6ff;
-      font-size:14px;
-      line-height:1.45;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-    .tips{
-      margin-top:14px;
-      padding:14px;
-      border-radius:18px;
-      background:rgba(124,156,255,.08);
-      border:1px solid rgba(124,156,255,.16);
-      color:#d3defd;
-      font-size:13px;
-      line-height:1.5;
-    }
-    .videos{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-    .video-card{
-      border:1px solid var(--line);
-      background:rgba(4,8,20,.55);
-      border-radius:22px;
-      overflow:hidden;
-      min-height:260px;
-    }
-    .video-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:12px 14px;
-      border-bottom:1px solid var(--line);
-      color:#d7e3ff;
-      font-size:14px;
-    }
-    .badge{
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid var(--line);
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-    }
-    video{
-      width:100%;
-      height:340px;
-      display:block;
-      background:#02040a;
-      object-fit:cover;
-      transform:scaleX(-1);
-    }
-    .bottom-tools{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-top:14px;
-    }
-    .foot{
-      margin-top:14px;
-      font-size:12px;
-      color:var(--muted);
-      text-align:center;
-    }
-    @media (max-width: 900px){
-      .layout{grid-template-columns:1fr}
-      .videos{grid-template-columns:1fr}
-      video{height:250px}
-    }
+    .status{margin-top:14px;padding:12px 13px;border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:16px;min-height:50px;color:#dbe6ff;font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+    .tips{margin-top:14px;padding:14px;border-radius:18px;background:rgba(124,156,255,.08);border:1px solid rgba(124,156,255,.16);color:#d3defd;font-size:13px;line-height:1.5}
+    .videos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .video-card{border:1px solid var(--line);background:rgba(4,8,20,.55);border-radius:22px;overflow:hidden;min-height:260px}
+    .video-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);color:#d7e3ff;font-size:14px}
+    .badge{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
+    video{width:100%;height:340px;display:block;background:#02040a;object-fit:cover;transform:scaleX(-1)}
+    .bottom-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .foot{margin-top:14px;font-size:12px;color:var(--muted);text-align:center}
+    @media (max-width:900px){.layout{grid-template-columns:1fr}.videos{grid-template-columns:1fr}video{height:250px}}
   </style>
 </head>
 <body>
@@ -206,10 +67,10 @@
         <div class="logo">PC</div>
         <div class="title">
           <h1>Private Call</h1>
-          <p>Render-ready 1-to-1 call page optimized for older Safari as much as possible.</p>
+          <p>Render-ready 1-to-1 call page using a simpler Safari-friendly offer/answer flow.</p>
         </div>
       </div>
-      <div class="pill">Best chance on iPad: Safari + HTTPS + strong Wi‑Fi</div>
+      <div class="pill">Best chance on iPad: Safari + Render HTTPS</div>
     </div>
 
     <div class="layout">
@@ -231,11 +92,11 @@
         <div class="status" id="status">Not connected.</div>
 
         <div class="tips">
-          <strong>For iPad iOS 12:</strong><br>
-          1. Use Safari only.<br>
-          2. Open the Render HTTPS link, not localhost.<br>
-          3. If camera fails, refresh once and try again.<br>
-          4. Old iPad support is limited, so this is optimized but not guaranteed.
+          <strong>What changed:</strong><br>
+          1. No argument-less <code>setLocalDescription()</code> now.<br>
+          2. No rollback-based negotiation for old Safari.<br>
+          3. First user sends the offer, second user sends the answer.<br>
+          4. Generate and room code lock while already in the room.
         </div>
       </div>
 
@@ -264,7 +125,7 @@
         </div>
 
         <div class="foot">
-          This version is designed for Render deployment and includes clearer status messages for debugging on iPad.
+          This build avoids newer negotiation patterns that older Safari versions often reject.
         </div>
       </div>
     </div>
@@ -278,13 +139,10 @@
       var remoteStream = null;
       var peer = null;
       var remoteSocketId = null;
-      var currentRoomId = null;
+      var inRoom = false;
       var isMuted = false;
       var isCameraOff = false;
-      var makingOffer = false;
-      var ignoreOffer = false;
-      var polite = false;
-      var inRoom = false;
+      var isOfferer = false;
 
       var els = {
         nameInput: document.getElementById('nameInput'),
@@ -302,9 +160,7 @@
         remoteState: document.getElementById('remoteState')
       };
 
-      function setStatus(text) {
-        els.status.textContent = text;
-      }
+      function setStatus(text) { els.status.textContent = text; }
 
       function generateRoomCode() {
         return 'room-' + Math.random().toString(36).slice(2, 8) + '-' + Math.random().toString(36).slice(2, 6);
@@ -352,25 +208,27 @@
       function stopStream(stream) {
         if (!stream) return;
         var tracks = stream.getTracks();
-        for (var i = 0; i < tracks.length; i++) {
-          tracks[i].stop();
-        }
+        for (var i = 0; i < tracks.length; i++) tracks[i].stop();
       }
 
       function ensurePeer() {
         if (peer) return peer;
 
         peer = new RTCPeerConnection({
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' }
-          ]
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
         });
+
+        if (localStream) {
+          localStream.getTracks().forEach(function(track) {
+            peer.addTrack(track, localStream);
+          });
+        }
 
         peer.onicecandidate = function (event) {
           if (event.candidate && remoteSocketId && socket) {
             socket.emit('signal', {
               to: remoteSocketId,
-              data: { candidate: event.candidate }
+              data: { type: 'candidate', candidate: event.candidate }
             });
           }
         };
@@ -380,9 +238,7 @@
             remoteStream = new MediaStream();
             els.remoteVideo.srcObject = remoteStream;
             els.remoteVideo.setAttribute('playsinline', 'true');
-            if (els.remoteVideo.play) {
-              els.remoteVideo.play().catch(function(){});
-            }
+            if (els.remoteVideo.play) els.remoteVideo.play().catch(function(){});
           }
           remoteStream.addTrack(event.track);
           els.remoteState.textContent = 'Connected';
@@ -395,37 +251,32 @@
             setStatus('Call connected.');
           } else if (state === 'failed' || state === 'disconnected') {
             els.remoteState.textContent = 'Issue';
-            setStatus('Connection issue. Try leaving and joining again.');
+            setStatus('Connection issue. Try leave then join again.');
           } else if (state === 'closed') {
             els.remoteState.textContent = 'Closed';
           }
         };
 
-        peer.onnegotiationneeded = async function () {
-          try {
-            if (!inRoom || !remoteSocketId) return;
-            makingOffer = true;
-            await peer.setLocalDescription();
-            socket.emit('signal', {
-              to: remoteSocketId,
-              data: { description: peer.localDescription }
-            });
-            setStatus('Negotiating call...');
-          } catch (err) {
-            setStatus('Negotiation error: ' + ((err && err.message) ? err.message : String(err)));
-          } finally {
-            makingOffer = false;
-          }
-        };
-
-        if (localStream) {
-          var tracks = localStream.getTracks();
-          for (var i = 0; i < tracks.length; i++) {
-            peer.addTrack(tracks[i], localStream);
-          }
-        }
-
         return peer;
+      }
+
+      async function sendOffer() {
+        try {
+          if (!peer || !remoteSocketId) return;
+          var offer = await peer.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+          });
+          await peer.setLocalDescription(offer);
+          socket.emit('signal', {
+            to: remoteSocketId,
+            data: { type: 'offer', offer: offer }
+          });
+          els.remoteState.textContent = 'Calling';
+          setStatus('Calling partner...');
+        } catch (err) {
+          setStatus('Offer error: ' + ((err && err.message) ? err.message : String(err)));
+        }
       }
 
       function resetCallUI() {
@@ -433,16 +284,14 @@
           try { peer.close(); } catch (e) {}
           peer = null;
         }
-
         stopStream(localStream);
         localStream = null;
         remoteStream = null;
         remoteSocketId = null;
-        currentRoomId = null;
-        makingOffer = false;
-        ignoreOffer = false;
-        polite = false;
         inRoom = false;
+        isOfferer = false;
+        isMuted = false;
+        isCameraOff = false;
 
         els.localVideo.srcObject = null;
         els.remoteVideo.srcObject = null;
@@ -474,10 +323,9 @@
         });
 
         socket.on('joined-room', function (payload) {
-          currentRoomId = payload.roomId;
-          polite = !!(payload.peers && payload.peers.length > 0);
-          setStatus('Joined room: ' + payload.roomId + '. ' + (payload.peers && payload.peers.length > 0 ? 'Partner found.' : 'Waiting for partner...'));
-
+          // first user -> no peers -> becomes offerer when second user joins
+          isOfferer = !(payload.peers && payload.peers.length > 0);
+          setStatus('Joined room: ' + payload.roomId + '. ' + (isOfferer ? 'Waiting for partner...' : 'Partner found.'));
           if (payload.peers && payload.peers.length > 0) {
             remoteSocketId = payload.peers[0];
             ensurePeer();
@@ -489,6 +337,9 @@
           els.remoteState.textContent = 'Joining';
           setStatus((payload.displayName || 'Partner') + ' joined. Starting call...');
           ensurePeer();
+          if (isOfferer) {
+            sendOffer();
+          }
         });
 
         socket.on('signal', async function (message) {
@@ -497,46 +348,27 @@
             var data = message.data || {};
             var pc = ensurePeer();
 
-            if (data.description) {
-              var offerCollision =
-                data.description.type === 'offer' &&
-                (makingOffer || pc.signalingState !== 'stable');
-
-              ignoreOffer = !polite && offerCollision;
-              if (ignoreOffer) {
-                return;
-              }
-
-              if (offerCollision) {
-                try {
-                  await Promise.all([
-                    pc.setLocalDescription({ type: 'rollback' }),
-                    pc.setRemoteDescription(data.description)
-                  ]);
-                } catch (_rollbackErr) {
-                  await pc.setRemoteDescription(data.description);
-                }
-              } else {
-                await pc.setRemoteDescription(data.description);
-              }
-
-              if (data.description.type === 'offer') {
-                await pc.setLocalDescription();
-                socket.emit('signal', {
-                  to: remoteSocketId,
-                  data: { description: pc.localDescription }
-                });
-                els.remoteState.textContent = 'Connecting';
-                setStatus('Incoming call accepted.');
-              } else if (data.description.type === 'answer') {
+            if (data.type === 'offer' && data.offer) {
+              await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+              var answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+              socket.emit('signal', {
+                to: remoteSocketId,
+                data: { type: 'answer', answer: answer }
+              });
+              els.remoteState.textContent = 'Connecting';
+              setStatus('Incoming call accepted.');
+            } else if (data.type === 'answer' && data.answer) {
+              if (pc.signalingState === 'have-local-offer') {
+                await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
                 els.remoteState.textContent = 'Connecting';
                 setStatus('Partner answered. Connecting...');
               }
-            } else if (data.candidate) {
+            } else if (data.type === 'candidate' && data.candidate) {
               try {
-                await pc.addIceCandidate(data.candidate);
+                await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
               } catch (err) {
-                if (!ignoreOffer) throw err;
+                setStatus('ICE error: ' + ((err && err.message) ? err.message : String(err)));
               }
             }
           } catch (err) {
@@ -588,13 +420,9 @@
           els.localVideo.srcObject = localStream;
           els.localVideo.setAttribute('playsinline', 'true');
           els.localVideo.muted = true;
-          if (els.localVideo.play) {
-            els.localVideo.play().catch(function(){});
-          }
+          if (els.localVideo.play) els.localVideo.play().catch(function(){});
           els.localState.textContent = 'Ready';
 
-          isMuted = false;
-          isCameraOff = false;
           inRoom = true;
           updateUiState();
 
@@ -664,7 +492,6 @@
         els.roomInput.value = generateRoomCode();
         setStatus('Room code generated.');
       });
-
       els.copyRoomBtn.addEventListener('click', copyRoom);
       els.joinBtn.addEventListener('click', joinRoom);
       els.leaveBtn.addEventListener('click', leaveRoom);
@@ -680,6 +507,5 @@
       updateUiState();
     })();
   </script>
-
 </body>
 </html>
